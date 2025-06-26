@@ -33,7 +33,13 @@ describe('Message model', () => {
 
       expect(savedMessage).toMatchObject(message1);
     });
-    // TODO: Task 2 - Write a test case for saveMessage when an error occurs
+    it('should return an error when saving fails', async () => {
+      mockingoose(MessageModel).toReturn(new Error('Save failed'), 'create');
+
+      const result = await saveMessage(message1);
+      expect(result).toHaveProperty('error');
+      expect((result as any).error).toContain('Failed to save message');
+    });
   });
 
   describe('getMessages', () => {
@@ -44,6 +50,11 @@ describe('Message model', () => {
 
       expect(messages).toMatchObject([message1, message2]);
     });
-    // TODO: Task 2 - Write a test case for getMessages when an error occurs
+    it('should return an empty array if fetch fails', async () => {
+      mockingoose(MessageModel).toReturn(new Error('Fetch failed'), 'find');
+
+      const messages = await getMessages();
+      expect(messages).toEqual([]);
+    });
   });
 });

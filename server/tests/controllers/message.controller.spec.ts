@@ -38,7 +38,35 @@ describe('POST /addMessage', () => {
     expect(response.text).toBe('Invalid request');
   });
 
-  // TODO: Task 2 - Write additional test cases for addMessageRoute
+  it('should return 400 if message has invalid fields', async () => {
+    const badMsg = {
+      msg: '',           
+      msgFrom: 'User1',
+      msgDateTime: new Date(),
+    };
+
+    const response = await supertest(app)
+      .post('/messaging/addMessage')
+      .send({ messageToAdd: badMsg });
+
+    expect(response.status).toBe(400);
+  });
+  it('should return 500 if saveMessage returns an error', async () => {
+    saveMessageSpy.mockResolvedValueOnce({ error: 'Failed to save' });
+
+    const msg = {
+      msg: 'Something',
+      msgFrom: 'User1',
+      msgDateTime: new Date(),
+    };
+
+    const response = await supertest(app)
+      .post('/messaging/addMessage')
+      .send({ messageToAdd: msg });
+
+    expect(response.status).toBe(500);
+    expect(response.body).toHaveProperty('error');
+  });
 });
 
 describe('GET /getMessages', () => {

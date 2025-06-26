@@ -11,11 +11,11 @@ import { Schema } from 'mongoose';
  */
 const messageSchema: Schema = new Schema(
   {
-    username: { type: String, required: true },
-    text: { type: String, required: true },
+    msgFrom: { type: String, required: true },
+    msg: { type: String, required: true },
   },
   {
-    timestamps: { createdAt: 'sentAt', updatedAt: false },
+    timestamps: { createdAt: 'msgDateTime', updatedAt: false },
     collection: 'Message',
   }
 );
