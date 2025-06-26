@@ -30,6 +30,10 @@ const getUserByUsernameSpy = jest.spyOn(util, 'getUserByUsername');
 const deleteUserByUsernameSpy = jest.spyOn(util, 'deleteUserByUsername');
 
 describe('Test userController', () => {
+  afterEach(() => {
+    jest.clearAllMocks();  
+  });
+
   describe('POST /signup', () => {
     it('should create a new user given correct arguments', async () => {
       const mockReqBody = {
@@ -57,7 +61,16 @@ describe('Test userController', () => {
       expect(response.text).toEqual('Invalid user body');
     });
 
-    // TODO: Task 1 - Write additional test cases for signupRoute
+    it('should return 500 if user already exists', async () => {
+      saveUserSpy.mockResolvedValueOnce({ error: 'User already exists' });
+
+      const response = await supertest(app)
+        .post('/user/signup')
+        .send({ username: 'user1', password: 'password' });
+
+      expect(response.status).toBe(500);
+      expect(response.body).toHaveProperty('error');
+    });
   });
 
   describe('POST /login', () => {
@@ -87,7 +100,17 @@ describe('Test userController', () => {
       expect(response.text).toEqual('Invalid user body');
     });
 
-    // TODO: Task 1 - Write additional test cases for loginRoute
+    it('should return 401 for invalid credentials', async () => {
+      loginUserSpy.mockResolvedValueOnce({ error: 'Invalid credentials' });
+
+      const response = await supertest(app)
+        .post('/user/login')
+        .send({ username: 'user1', password: 'wrongpassword' });
+
+      expect(response.status).toBe(401);
+      expect(response.body).toHaveProperty('error');
+    });
+
   });
 
   describe('PATCH /resetPassword', () => {
@@ -117,7 +140,16 @@ describe('Test userController', () => {
       expect(response.text).toEqual('Invalid user body');
     });
 
-    // TODO: Task 1 - Write additional test cases for resetPasswordRoute
+    it('should return 404 if user not found on resetPassword', async () => {
+      updatedUserSpy.mockResolvedValueOnce({ error: 'User not found' });
+
+      const response = await supertest(app)
+        .patch('/user/resetPassword')
+        .send({ username: 'nouser', password: 'newpass' });
+
+      expect(response.status).toBe(404);
+      expect(response.body).toHaveProperty('error');
+    });
   });
 
   describe('GET /getUser', () => {
@@ -138,7 +170,15 @@ describe('Test userController', () => {
       expect(response.status).toBe(404);
     });
 
-    // TODO: Task 1 - Write additional test cases for getUserRoute
+    it('should return 404 if user is not found', async () => {
+      getUserByUsernameSpy.mockResolvedValueOnce({ error: 'User not found' });
+
+      const response = await supertest(app)
+        .get('/user/getUser/nouser');
+
+      expect(response.status).toBe(404);
+      expect(response.body).toHaveProperty('error');
+    });
   });
 
   describe('DELETE /deleteUser', () => {
@@ -159,6 +199,14 @@ describe('Test userController', () => {
       expect(response.status).toBe(404);
     });
 
-    // TODO: Task 1 - Write additional test cases for deleteUserRoute
+    it('should return 404 if user not found on deleteUser', async () => {
+      deleteUserByUsernameSpy.mockResolvedValueOnce({ error: 'User not found' });
+
+      const response = await supertest(app)
+        .delete('/user/deleteUser/nouser');
+
+      expect(response.status).toBe(404);
+      expect(response.body).toHaveProperty('error');
+    });
   });
 });

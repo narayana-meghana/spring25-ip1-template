@@ -32,8 +32,13 @@ describe('User model', () => {
       expect(savedUser.dateJoined).toEqual(user.dateJoined);
     });
 
-    // TODO: Task 1 - Write additional test cases for saveUser
-  });
+    it('should return error if save fails', async () => {
+      mockingoose(UserModel).toReturn(new Error('Duplicate key'), 'create');
+
+      const result = await saveUser(user);
+      expect('error' in result).toBe(true);
+    });
+      });
 });
 
 describe('getUserByUsername', () => {
@@ -50,7 +55,12 @@ describe('getUserByUsername', () => {
     expect(retrievedUser.dateJoined).toEqual(user.dateJoined);
   });
 
-  // TODO: Task 1 - Write additional test cases for getUserByUsername
+  it('should return error if user is not found', async () => {
+    mockingoose(UserModel).toReturn(null, 'findOne');
+
+    const result = await getUserByUsername('nouser');
+    expect('error' in result).toBe(true);
+  });
 });
 
 describe('loginUser', () => {
@@ -72,7 +82,12 @@ describe('loginUser', () => {
     expect(loggedInUser.dateJoined).toEqual(user.dateJoined);
   });
 
-  // TODO: Task 1 - Write additional test cases for loginUser
+  it('should return error if credentials are wrong', async () => {
+    mockingoose(UserModel).toReturn(null, 'findOne');
+
+    const result = await loginUser({ username: 'user1', password: 'wrong' });
+    expect('error' in result).toBe(true);
+  });
 });
 
 describe('deleteUserByUsername', () => {
@@ -89,7 +104,12 @@ describe('deleteUserByUsername', () => {
     expect(deletedUser.dateJoined).toEqual(user.dateJoined);
   });
 
-  // TODO: Task 1 - Write additional test cases for deleteUserByUsername
+  it('should return error if user does not exist for delete', async () => {
+    mockingoose(UserModel).toReturn(null, 'findOneAndDelete');
+
+    const result = await deleteUserByUsername('nouser');
+    expect('error' in result).toBe(true);
+  });
 });
 
 describe('updateUser', () => {
@@ -122,5 +142,10 @@ describe('updateUser', () => {
     expect(result.dateJoined).toEqual(updatedUser.dateJoined);
   });
 
-  // TODO: Task 1 - Write additional test cases for updateUser
+  it('should return error if user does not exist for update', async () => {
+    mockingoose(UserModel).toReturn(null, 'findOneAndUpdate');
+
+    const result = await updateUser('nouser', { password: 'newpass' });
+    expect('error' in result).toBe(true);
+  });
 });
