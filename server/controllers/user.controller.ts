@@ -8,16 +8,19 @@ import {
   updateUser,
 } from '../services/user.service';
 
-const userController = () => {
+const userController = (): Router => {
   const router: Router = express.Router();
 
   /**
-   * Validates that the request body contains all required fields for a user.
-   * @param req The incoming request containing user data.
-   * @returns `true` if the body contains valid user fields; otherwise, `false`.
-   */
-  const isUserBodyValid = (req: UserRequest): boolean => false;
-  // TODO: Task 1 - Implement the isUserBodyValid function
+ * Validates that the request body contains all required fields for a user.
+ * @param req The incoming request containing user data.
+ * @returns `true` if the body contains valid user fields; otherwise, `false`.
+ */
+  const isUserBodyValid = (req: UserRequest): boolean => {
+    const { username, password } = req.body;
+    return typeof username === 'string' && typeof password === 'string';
+  };
+
 
   /**
    * Handles the creation of a new user account.
@@ -26,56 +29,104 @@ const userController = () => {
    * @returns A promise resolving to void.
    */
   const createUser = async (req: UserRequest, res: Response): Promise<void> => {
-    // TODO: Task 1 - Implement the createUser function
-    res.status(501).send('Not implemented');
+    if (!isUserBodyValid(req)) {
+      res.status(400).send('Invalid user body');
+      return;
+    }
+
+    const { username, password } = req.body;
+
+    const result = await saveUser({ username, password, dateJoined: new Date() });
+
+    if ('error' in result) {
+      res.status(500).json(result);
+    } else {
+      res.status(200).json(result);
+    }
   };
 
   /**
-   * Handles user login by validating credentials.
-   * @param req The request containing username and password in the body.
-   * @param res The response, either returning the user or an error.
-   * @returns A promise resolving to void.
-   */
+    * Handles user login by validating credentials.
+    * @param req The request containing username and password in the body.
+    * @param res The response, either returning the user or an error.
+    * @returns A promise resolving to void.
+    */
   const userLogin = async (req: UserRequest, res: Response): Promise<void> => {
-    // TODO: Task 1 - Implement the userLogin function
-    res.status(501).send('Not implemented');
+    if (!isUserBodyValid(req)) {
+      res.status(400).send('Invalid user body');
+      return;
+    }
+
+    const { username, password } = req.body;
+
+    const result = await loginUser({ username, password });
+
+    if ('error' in result) {
+      res.status(401).json(result);
+    } else {
+      res.status(200).json(result);
+    }
   };
 
-  /**
-   * Retrieves a user by their username.
-   * @param req The request containing the username as a route parameter.
-   * @param res The response, either returning the user or an error.
-   * @returns A promise resolving to void.
-   */
   const getUser = async (req: UserByUsernameRequest, res: Response): Promise<void> => {
-    // TODO: Task 1 - Implement the getUser function
-    res.status(501).send('Not implemented');
+    const { username } = req.params;
+
+    const result = await getUserByUsername(username);
+
+    if ('error' in result) {
+      res.status(404).json(result);
+    } else {
+      res.status(200).json(result);
+    }
   };
 
   /**
-   * Deletes a user by their username.
-   * @param req The request containing the username as a route parameter.
-   * @param res The response, either the successfully deleted user object or returning an error.
-   * @returns A promise resolving to void.
-   */
+    * Deletes a user by their username.
+    * @param req The request containing the username as a route parameter.
+    * @param res The response, either the successfully deleted user object or returning an error.
+    * @returns A promise resolving to void.
+    */
   const deleteUser = async (req: UserByUsernameRequest, res: Response): Promise<void> => {
-    // TODO: Task 1 - Implement the deleteUser function
-    res.status(501).send('Not implemented');
-  };
+    const { username } = req.params;
 
+    const result = await deleteUserByUsername(username);
+
+    if ('error' in result) {
+      res.status(404).json(result);
+    } else {
+      res.status(200).json(result);
+    }
+  };
+  
   /**
-   * Resets a user's password.
-   * @param req The request containing the username and new password in the body.
-   * @param res The response, either the successfully updated user object or returning an error.
-   * @returns A promise resolving to void.
-   */
+    * Resets a user's password.
+    * @param req The request containing the username and new password in the body.
+    * @param res The response, either the successfully updated user object or returning an error.
+    * @returns A promise resolving to void.
+    */
   const resetPassword = async (req: UserRequest, res: Response): Promise<void> => {
-    // TODO: Task 1 - Implement the resetPassword function
-    res.status(501).send('Not implemented');
+    const { username, password: newPassword } = req.body;
+
+    if (typeof username !== 'string' || typeof newPassword !== 'string') {
+      res.status(400).send('Invalid user body');
+      return;
+    }
+
+    const result = await updateUser(username, { password: newPassword });
+
+    if ('error' in result) {
+      res.status(404).json(result);
+    } else {
+      res.status(200).json(result);
+    }
   };
 
   // Define routes for the user-related operations.
-  // TODO: Task 1 - Add appropriate HTTP verbs and endpoints to the router
+  router.post('/user/signup', createUser);
+  router.post('/user/login', userLogin);
+  router.get('/user/getUser/:username', getUser);
+  router.delete('/user/deleteUser/:username', deleteUser);
+  router.patch('/user/resetPassword', resetPassword);
 
   return router;
 };
