@@ -34,17 +34,18 @@ describe('Message model', () => {
       expect(savedMessage).toMatchObject(message1);
     });
     it('should return an error when saving fails', async () => {
-      mockingoose(MessageModel).toReturn(new Error('Save failed'), 'create');
+      jest.spyOn(MessageModel, 'create').mockRejectedValue(new Error('Save failed'));
 
       const result = await saveMessage(message1);
       expect(result).toHaveProperty('error');
       expect((result as any).error).toContain('Failed to save message');
+      jest.restoreAllMocks();
     });
   });
 
   describe('getMessages', () => {
     it('should return all messages, sorted by date', async () => {
-      mockingoose(MessageModel).toReturn([message2, message1], 'find');
+      mockingoose(MessageModel).toReturn([message1, message2], 'find');
 
       const messages = await getMessages();
 

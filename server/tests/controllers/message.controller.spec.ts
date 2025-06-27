@@ -35,7 +35,7 @@ describe('POST /addMessage', () => {
     const response = await supertest(app).post('/messaging/addMessage').send({});
 
     expect(response.status).toBe(400);
-    expect(response.text).toBe('Invalid request');
+    expect(response.text).toBe('Invalid message body');
   });
 
   it('should return 400 if message has invalid fields', async () => {
