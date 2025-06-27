@@ -5,7 +5,7 @@ import {
   getUserByUsername,
   loginUser,
   saveUser,
-  updateUser,
+  resetPassword
 } from '../services/user.service';
 
 const userController = (): Router => {
@@ -104,7 +104,7 @@ const userController = (): Router => {
     * @param res The response, either the successfully updated user object or returning an error.
     * @returns A promise resolving to void.
     */
-  const resetPassword = async (req: UserRequest, res: Response): Promise<void> => {
+  const resetPasswordHandler = async (req: UserRequest, res: Response): Promise<void> => {
     const { username, password: newPassword } = req.body;
 
     if (typeof username !== 'string' || typeof newPassword !== 'string') {
@@ -112,21 +112,21 @@ const userController = (): Router => {
       return;
     }
 
-    const result = await updateUser(username, { password: newPassword });
+    const result = await resetPassword(username, newPassword); 
 
     if ('error' in result) {
       res.status(404).json(result);
     } else {
       res.status(200).json(result);
     }
-  };
+  };  
 
   // Define routes for the user-related operations.
-  router.post('/user/signup', createUser);
-  router.post('/user/login', userLogin);
-  router.get('/user/getUser/:username', getUser);
-  router.delete('/user/deleteUser/:username', deleteUser);
-  router.patch('/user/resetPassword', resetPassword);
+  router.post('/signup', createUser);
+  router.post('/login', userLogin);
+  router.get('/getUser/:username', getUser);
+  router.delete('/deleteUser/:username', deleteUser);
+  router.patch('/resetPassword', resetPasswordHandler);
 
   return router;
 };

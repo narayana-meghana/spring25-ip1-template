@@ -28,11 +28,12 @@ const loginUserSpy = jest.spyOn(util, 'loginUser');
 const updatedUserSpy = jest.spyOn(util, 'updateUser');
 const getUserByUsernameSpy = jest.spyOn(util, 'getUserByUsername');
 const deleteUserByUsernameSpy = jest.spyOn(util, 'deleteUserByUsername');
+const resetPasswordSpy = jest.spyOn(util, 'resetPassword');
 
 describe('Test userController', () => {
-  afterEach(() => {
-    jest.clearAllMocks();  
-  });
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });  
 
   describe('POST /signup', () => {
     it('should create a new user given correct arguments', async () => {
@@ -120,13 +121,13 @@ describe('Test userController', () => {
         password: 'newPassword',
       };
 
-      updatedUserSpy.mockResolvedValueOnce(mockSafeUser);
+      resetPasswordSpy.mockResolvedValueOnce(mockSafeUser);
 
       const response = await supertest(app).patch('/user/resetPassword').send(mockReqBody);
 
       expect(response.status).toBe(200);
       expect(response.body).toEqual({ ...mockUserJSONResponse });
-      expect(updatedUserSpy).toHaveBeenCalledWith(mockUser.username, { password: 'newPassword' });
+      expect(resetPasswordSpy).toHaveBeenCalledWith(mockUser.username, 'newPassword');
     });
 
     it('should return 400 for request missing username', async () => {
@@ -141,7 +142,7 @@ describe('Test userController', () => {
     });
 
     it('should return 404 if user not found on resetPassword', async () => {
-      updatedUserSpy.mockResolvedValueOnce({ error: 'User not found' });
+      resetPasswordSpy.mockResolvedValueOnce({ error: 'User not found' });
 
       const response = await supertest(app)
         .patch('/user/resetPassword')

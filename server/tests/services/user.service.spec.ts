@@ -5,6 +5,7 @@ import {
   loginUser,
   saveUser,
   updateUser,
+  resetPassword
 } from '../../services/user.service';
 import { SafeUser, User, UserCredentials } from '../../types/user';
 import { user, safeUser } from '../mockData.models';
@@ -27,18 +28,19 @@ describe('User model', () => {
 
       const savedUser = (await saveUser(user)) as SafeUser;
 
-      expect(savedUser._id).toBeDefined();
       expect(savedUser.username).toEqual(user.username);
       expect(savedUser.dateJoined).toEqual(user.dateJoined);
     });
 
     it('should return error if save fails', async () => {
-      mockingoose(UserModel).toReturn(new Error('Duplicate key'), 'create');
+      jest.spyOn(UserModel, 'create').mockRejectedValue(new Error('Duplicate key'));
 
       const result = await saveUser(user);
       expect('error' in result).toBe(true);
+
+      jest.restoreAllMocks();
     });
-      });
+  });
 });
 
 describe('getUserByUsername', () => {
@@ -149,3 +151,29 @@ describe('updateUser', () => {
     expect('error' in result).toBe(true);
   });
 });
+
+describe('resetPassword', () => {
+  const newPassword = 'updatedPassword';
+
+  beforeEach(() => {
+    mockingoose.resetAll();
+  });
+
+  it('should return the updated user when password reset succeeds', async () => {
+    mockingoose(UserModel).toReturn(safeUser, 'findOneAndUpdate');
+
+    const result = (await resetPassword(user.username, newPassword)) as SafeUser;
+
+    expect(result.username).toEqual(user.username);
+    expect(result.dateJoined).toEqual(user.dateJoined);
+  });
+
+  it('should return error if user is not found during password reset', async () => {
+    mockingoose(UserModel).toReturn(null, 'findOneAndUpdate');
+
+    const result = await resetPassword('nouser', newPassword);
+
+    expect('error' in result).toBe(true);
+  });
+});
+

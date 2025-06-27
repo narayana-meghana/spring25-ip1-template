@@ -1,5 +1,5 @@
 import UserModel from '../models/users.model';
-import { User, UserCredentials, UserResponse } from '../types/types';
+import { SafeUser, User, UserCredentials, UserResponse } from '../types/types';
 
 /**
  * Saves a new user to the database.
@@ -107,5 +107,36 @@ export const updateUser = async (username: string, updates: Partial<User>): Prom
     };
   } catch (err: any) {
     return { error: 'Failed to update user: ' + err.message };
+  }
+};
+
+/**
+ * Updates a user's password.
+ *
+ * @param username - The username of the user whose password is being reset
+ * @param newPassword - The new password to set
+ * @returns The updated user object or an error
+ */
+export const resetPassword = async (
+  username: string,
+  newPassword: string
+): Promise<SafeUser | { error: string }> => {
+  try {
+    const updated = await UserModel.findOneAndUpdate(
+      { username },
+      { password: newPassword },
+      { new: true }
+    );
+
+    if (!updated) {
+      return { error: 'User not found' };
+    }
+
+    return {
+      username: updated.username,
+      dateJoined: updated.dateJoined,
+    };
+  } catch (err: any) {
+    return { error: 'Failed to reset password: ' + err.message };
   }
 };
