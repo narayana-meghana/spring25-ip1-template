@@ -5,7 +5,7 @@ import {
   loginUser,
   saveUser,
   updateUser,
-  resetPassword
+  resetPassword,
 } from '../../services/user.service';
 import { SafeUser, User, UserCredentials } from '../../types/user';
 import { user, safeUser } from '../mockData.models';
@@ -176,4 +176,3 @@ describe('resetPassword', () => {
     expect('error' in result).toBe(true);
   });
 });
-

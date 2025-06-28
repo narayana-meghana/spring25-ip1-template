@@ -5,7 +5,7 @@ import { Message, MessageResponse } from '../types/types';
  * Saves a new message to the database.
  *
  * @param {Message} message - The message to save
- * 
+ *
  * @returns {Promise<MessageResponse>} - The saved message or an error message
  */
 export const saveMessage = async (message: Message): Promise<MessageResponse> => {
@@ -17,8 +17,8 @@ export const saveMessage = async (message: Message): Promise<MessageResponse> =>
       msgFrom: created.msgFrom,
       msgDateTime: created.msgDateTime,
     };
-  } catch (err: any) {
-    return { error: 'Failed to save message: ' + err.message };
+  } catch (error) {
+    return { error: `Failed to save message` };
   }
 };
 
@@ -30,7 +30,7 @@ export const saveMessage = async (message: Message): Promise<MessageResponse> =>
 export const getMessages = async (): Promise<Message[]> => {
   try {
     const messages = await MessageModel.find().sort({ msgDateTime: 1 });
-    return messages.map((msgDoc) => ({
+    return messages.map(msgDoc => ({
       _id: msgDoc._id,
       msg: msgDoc.msg,
       msgFrom: msgDoc.msgFrom,

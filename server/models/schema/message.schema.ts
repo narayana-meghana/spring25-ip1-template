@@ -17,7 +17,7 @@ const messageSchema: Schema = new Schema(
   {
     timestamps: { createdAt: 'msgDateTime', updatedAt: false },
     collection: 'Message',
-  }
+  },
 );
 
 export default messageSchema;

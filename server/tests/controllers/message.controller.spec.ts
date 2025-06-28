@@ -40,7 +40,7 @@ describe('POST /addMessage', () => {
 
   it('should return 400 if message has invalid fields', async () => {
     const badMsg = {
-      msg: '',           
+      msg: '',
       msgFrom: 'User1',
       msgDateTime: new Date(),
     };
@@ -60,9 +60,7 @@ describe('POST /addMessage', () => {
       msgDateTime: new Date(),
     };
 
-    const response = await supertest(app)
-      .post('/messaging/addMessage')
-      .send({ messageToAdd: msg });
+    const response = await supertest(app).post('/messaging/addMessage').send({ messageToAdd: msg });
 
     expect(response.status).toBe(500);
     expect(response.body).toHaveProperty('error');

@@ -25,7 +25,6 @@ const mockUserJSONResponse = {
 
 const saveUserSpy = jest.spyOn(util, 'saveUser');
 const loginUserSpy = jest.spyOn(util, 'loginUser');
-const updatedUserSpy = jest.spyOn(util, 'updateUser');
 const getUserByUsernameSpy = jest.spyOn(util, 'getUserByUsername');
 const deleteUserByUsernameSpy = jest.spyOn(util, 'deleteUserByUsername');
 const resetPasswordSpy = jest.spyOn(util, 'resetPassword');
@@ -33,7 +32,7 @@ const resetPasswordSpy = jest.spyOn(util, 'resetPassword');
 describe('Test userController', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-  });  
+  });
 
   describe('POST /signup', () => {
     it('should create a new user given correct arguments', async () => {
@@ -111,7 +110,6 @@ describe('Test userController', () => {
       expect(response.status).toBe(401);
       expect(response.body).toHaveProperty('error');
     });
-
   });
 
   describe('PATCH /resetPassword', () => {
@@ -174,8 +172,7 @@ describe('Test userController', () => {
     it('should return 404 if user is not found', async () => {
       getUserByUsernameSpy.mockResolvedValueOnce({ error: 'User not found' });
 
-      const response = await supertest(app)
-        .get('/user/getUser/nouser');
+      const response = await supertest(app).get('/user/getUser/nouser');
 
       expect(response.status).toBe(404);
       expect(response.body).toHaveProperty('error');
@@ -203,8 +200,7 @@ describe('Test userController', () => {
     it('should return 404 if user not found on deleteUser', async () => {
       deleteUserByUsernameSpy.mockResolvedValueOnce({ error: 'User not found' });
 
-      const response = await supertest(app)
-        .delete('/user/deleteUser/nouser');
+      const response = await supertest(app).delete('/user/deleteUser/nouser');
 
       expect(response.status).toBe(404);
       expect(response.body).toHaveProperty('error');

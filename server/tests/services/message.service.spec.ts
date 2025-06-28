@@ -38,7 +38,8 @@ describe('Message model', () => {
 
       const result = await saveMessage(message1);
       expect(result).toHaveProperty('error');
-      expect((result as any).error).toContain('Failed to save message');
+      expect(result).toEqual({ error: 'Failed to save message' });
+
       jest.restoreAllMocks();
     });
   });

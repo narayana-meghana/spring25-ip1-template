@@ -17,7 +17,7 @@ const userSchema: Schema = new Schema(
   {
     timestamps: { createdAt: 'dateJoined', updatedAt: false },
     collection: 'User',
-  }
+  },
 );
 
 export default userSchema;

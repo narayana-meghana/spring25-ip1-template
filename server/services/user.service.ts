@@ -14,8 +14,8 @@ export const saveUser = async (user: User): Promise<UserResponse> => {
       username: createdUser.username,
       dateJoined: createdUser.dateJoined,
     };
-  } catch (err: any) {
-    return { error: 'Failed to save user: ' + err.message };
+  } catch (error) {
+    return { error: `Failed to save user` };
   }
 };
 
@@ -34,8 +34,8 @@ export const getUserByUsername = async (username: string): Promise<UserResponse>
       username: user.username,
       dateJoined: user.dateJoined,
     };
-  } catch (err: any) {
-    return { error: 'Error fetching user: ' + err.message };
+  } catch (error) {
+    return { error: `Error fetching user` };
   }
 };
 
@@ -58,8 +58,8 @@ export const loginUser = async (loginCredentials: UserCredentials): Promise<User
       username: user.username,
       dateJoined: user.dateJoined,
     };
-  } catch (err: any) {
-    return { error: 'Login failed: ' + err.message };
+  } catch (error) {
+    return { error: `Login failed` };
   }
 };
 
@@ -79,8 +79,8 @@ export const deleteUserByUsername = async (username: string): Promise<UserRespon
       username: deletedUser.username,
       dateJoined: deletedUser.dateJoined,
     };
-  } catch (err: any) {
-    return { error: 'Failed to delete user: ' + err.message };
+  } catch (error) {
+    return { error: `Failed to delete user` };
   }
 };
 
@@ -91,13 +91,12 @@ export const deleteUserByUsername = async (username: string): Promise<UserRespon
  * @param {Partial<User>} updates - An object containing the fields to update and their new values.
  * @returns {Promise<UserResponse>} - Resolves with the updated user object (without the password) or an error message.
  */
-export const updateUser = async (username: string, updates: Partial<User>): Promise<UserResponse> => {
+export const updateUser = async (
+  username: string,
+  updates: Partial<User>,
+): Promise<UserResponse> => {
   try {
-    const updatedUser = await UserModel.findOneAndUpdate(
-      { username },
-      updates,
-      { new: true }
-    );
+    const updatedUser = await UserModel.findOneAndUpdate({ username }, updates, { new: true });
 
     if (!updatedUser) return { error: 'User not found' };
 
@@ -105,8 +104,8 @@ export const updateUser = async (username: string, updates: Partial<User>): Prom
       username: updatedUser.username,
       dateJoined: updatedUser.dateJoined,
     };
-  } catch (err: any) {
-    return { error: 'Failed to update user: ' + err.message };
+  } catch (error) {
+    return { error: `Failed to update user` };
   }
 };
 
@@ -119,13 +118,13 @@ export const updateUser = async (username: string, updates: Partial<User>): Prom
  */
 export const resetPassword = async (
   username: string,
-  newPassword: string
+  newPassword: string,
 ): Promise<SafeUser | { error: string }> => {
   try {
     const updated = await UserModel.findOneAndUpdate(
       { username },
       { password: newPassword },
-      { new: true }
+      { new: true },
     );
 
     if (!updated) {
@@ -136,7 +135,7 @@ export const resetPassword = async (
       username: updated.username,
       dateJoined: updated.dateJoined,
     };
-  } catch (err: any) {
-    return { error: 'Failed to reset password: ' + err.message };
+  } catch (error) {
+    return { error: `Failed to reset password` };
   }
 };
