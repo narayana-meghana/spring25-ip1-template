@@ -10,9 +10,10 @@ import { SafeUser, User, UserCredentials, UserResponse } from '../types/types';
 export const saveUser = async (user: User): Promise<UserResponse> => {
   try {
     const createdUser = await UserModel.create(user);
+    const safeUser = await UserModel.findById(createdUser._id).select('-password');
     return {
-      username: createdUser.username,
-      dateJoined: createdUser.dateJoined,
+      username: safeUser!.username,
+      dateJoined: safeUser!.dateJoined,
     };
   } catch (error) {
     return { error: `Failed to save user` };
@@ -27,7 +28,7 @@ export const saveUser = async (user: User): Promise<UserResponse> => {
  */
 export const getUserByUsername = async (username: string): Promise<UserResponse> => {
   try {
-    const user = await UserModel.findOne({ username });
+    const user = await UserModel.findOne({ username }).select('-password');
     if (!user) return { error: 'User not found' };
 
     return {
@@ -50,7 +51,7 @@ export const loginUser = async (loginCredentials: UserCredentials): Promise<User
     const user = await UserModel.findOne({
       username: loginCredentials.username,
       password: loginCredentials.password,
-    });
+    }).select('-password');
 
     if (!user) return { error: 'Invalid username or password' };
 
@@ -71,7 +72,7 @@ export const loginUser = async (loginCredentials: UserCredentials): Promise<User
  */
 export const deleteUserByUsername = async (username: string): Promise<UserResponse> => {
   try {
-    const deletedUser = await UserModel.findOneAndDelete({ username });
+    const deletedUser = await UserModel.findOneAndDelete({ username }).select('-password');
 
     if (!deletedUser) return { error: 'User not found' };
 
@@ -96,7 +97,7 @@ export const updateUser = async (
   updates: Partial<User>,
 ): Promise<UserResponse> => {
   try {
-    const updatedUser = await UserModel.findOneAndUpdate({ username }, updates, { new: true });
+    const updatedUser = await UserModel.findOneAndUpdate({ username }, updates, { new: true }).select('-password');
 
     if (!updatedUser) return { error: 'User not found' };
 
@@ -125,7 +126,7 @@ export const resetPassword = async (
       { username },
       { password: newPassword },
       { new: true },
-    );
+    ).select('-password');
 
     if (!updated) {
       return { error: 'User not found' };
